@@ -1,17 +1,15 @@
 <?php
 namespace App\Table;
-class Article{
 
-    /**
-     * fonction magique qui detecte les proprietes qui n'existent pas
-     * @param mixed $name
-     * @return void
-     */
-    public function __get($key)
-    {
-        $method = 'get'.ucfirst($key);
-        $this->$key = $this->$method();
-        return $this->$key;
+use App\App;
+
+class Article extends Model{
+
+    protected static $table = 'articles';
+
+    public static function getAll(){
+
+        return self::query("SELECT articles.id as id, articles.titre as titre, articles.contenu as contenu, categories.titre as category FROM articles LEFT JOIN categories ON category_id = categories.id");
     }
 
 
@@ -23,5 +21,19 @@ class Article{
         $html = '<p>'. substr($this->contenu,0,200).'...</p>';
         $html .= '<p><a href="'.$this->getURL().'">Voir la suite</a></p>';
         return $html;
+    }
+
+    public static function lastByCategory($category_id)
+    {
+
+        return self::query(
+            "SELECT articles.id as id, articles.titre as titre, articles.contenu as contenu, categories.titre as category 
+        FROM articles 
+        LEFT JOIN categories 
+        ON category_id = categories.id
+        WHERE category_id = :category_id",
+            ["category_id" => $category_id],
+            false
+        );
     }
 }

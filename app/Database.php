@@ -35,9 +35,22 @@ class Database
         return $conn;
     }
 
-    public function query($statement,$class_name){
+    /**
+     * requete de selection
+     * @param string $statement qui est la requete SQL qui va etre executer
+     * @param string $class_name qui fait reference à la classe qui est utiliser
+     * @param bool $one specifie si on doit recuperer une seule colone ou pas
+     * @return mixed retourne le resultat de la recherche
+     */
+    public function query($statement,$class_name,$one=false){
         $req = $this->getPDO()->query($statement);
-        $data = $req->fetchAll(PDO::FETCH_CLASS,$class_name);
+        $req->setFetchMode(PDO::FETCH_CLASS,$class_name);
+        if ($one === true) {
+            $data = $req->fetch();
+        } else {
+            $data = $req->fetchAll();
+        }
+        
         return $data;
     }
 
